@@ -1,0 +1,266 @@
+﻿<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Coco Feutre</title>
+    <meta
+      name="description"
+      content="Mini site de l'univers Coco Feutre : personnages, lieux merveilleux, gourmandises, chansons et petites aventures colorées."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar" aria-label="Navigation principale">
+      <a class="brand" href="#accueil" aria-label="Accueil Coco Feutre">
+        <span class="brand-mark">CF</span>
+        <span>Coco Feutre</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#youtube">YouTube</a>
+        <a href="#lieux">Lieux</a>
+        <a href="#personnages">Personnages</a>
+        <a href="#galerie">Images</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="accueil" class="hero">
+        <img src="assets/monde-coco-feutre.png" alt="Carte illustrée du monde de Coco Feutre" class="hero-image">
+        <div class="hero-shade"></div>
+        <div class="hero-copy">
+          <p class="eyebrow">Univers artistique familial</p>
+          <h1>Coco Feutre</h1>
+          <p>
+            Un monde joyeux, tendre et très coloré, peuplé de personnages rigolos,
+            de chansons, de décors gourmands et de petites aventures pleines de fantaisie.
+          </p>
+          <div class="hero-actions">
+            <a class="button play-button" href="jeux/bozo/index.html">Jouer à Petit Bozo</a>
+            <a class="button primary" href="#lieux">Explorer les lieux</a>
+            <a class="button secondary" href="#personnages">Voir les amis</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="youtube" class="youtube-band" aria-label="Chaîne YouTube Coco Feutre">
+        <div class="youtube-copy">
+          <p class="eyebrow">Chansons et vidéos</p>
+          <h2>La chaîne YouTube Coco Feutre</h2>
+          <p>
+            Retrouve Croque-Quenotte et l'univers Coco Feutre en vidéo, avec les chansons,
+            les personnages et les petites aventures colorées.
+          </p>
+          <a class="button youtube-button" href="https://www.youtube.com/channel/UCuplLanOqAU5u5A9K5XQi5A" target="_blank" rel="noopener">
+            Voir la chaîne YouTube
+          </a>
+        </div>
+        <div class="youtube-frame-wrap">
+          <img src="assets/bonbons-cassants.png" alt="Bonbons cassants dans la boutique de Coco Feutre" class="youtube-poster">
+          <iframe
+            class="youtube-frame"
+            src="https://www.youtube-nocookie.com/embed/S4UEmDE1bTU"
+            title="Croque-Quenotte sur la chaîne YouTube Coco Feutre"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </section>
+
+      <section class="pouic-callout" aria-label="La Machine à Pouic">
+        <div class="pouic-card">
+          <p class="eyebrow">Nouveau jouet sonore</p>
+          <h2>La Machine à Pouic</h2>
+          <p>Appuie, écoute, rigole : une petite machine Coco Feutre pleine de sons, d'images et de surprises.</p>
+          <a class="button pouic-button" href="jeux/machine-a-pouic/">Jouer à La Machine à Pouic</a>
+        </div>
+      </section>
+
+      <section class="intro-band" aria-label="Bienvenue">
+        <div class="intro-copy">
+          <p>
+            Bienvenue dans l'univers Coco Feutre, où Fifi prépare des douceurs,
+            Tricotine fait danser le grenier, Tapotin explore la Montagne Bibi,
+            et toute une bande d'amis traverse forêts, prairies, rivière, ferme,
+            océan et brousse avec humour doux.
+          </p>
+        </div>
+      </section>
+
+      <section id="lieux" class="section places-section">
+        <div class="section-heading">
+          <p class="eyebrow">Carte vivante</p>
+          <h2>Les Grands Lieux</h2>
+          <p>Chaque lieu a son ambiance, ses amis, ses chansons et ses petites histoires.</p>
+        </div>
+
+        <div class="place-picker" aria-label="Choisir un lieu">
+          <button class="place-tab is-active" type="button" data-place="boulangerie">Boulangerie</button>
+          <button class="place-tab" type="button" data-place="ville-foret">Ville-Forêt</button>
+          <button class="place-tab" type="button" data-place="foret-pompon">Forêt Pompon</button>
+          <button class="place-tab" type="button" data-place="ferme">Ferme Foin-Foin</button>
+          <button class="place-tab" type="button" data-place="prairie">Prairie Fleurie</button>
+          <button class="place-tab" type="button" data-place="manoir">Manoir</button>
+          <button class="place-tab" type="button" data-place="montagne">Montagne Bibi</button>
+          <button class="place-tab" type="button" data-place="ocean">Océan</button>
+          <button class="place-tab" type="button" data-place="brousse">Brousse</button>
+        </div>
+
+        <article class="place-focus" id="placeFocus" aria-live="polite">
+          <div class="place-media">
+            <img id="placeImage" src="assets/boulangerie-exterieur.png" alt="">
+          </div>
+          <div class="place-content">
+            <p class="place-kicker" id="placeKicker">Lieu gourmand</p>
+            <h3 id="placeTitle">La boulangerie de Fifi</h3>
+            <p id="placeText">
+              La boulangerie de Fifi rassemble la vitrine, le salon de thé, le petit
+              jardin et l'atelier où le grand four à pain chauffe les fournées.
+            </p>
+            <div>
+              <h4>On y croise</h4>
+              <p id="placeFriends">Fifi, Pinouille, Galipo, Gros Bidouille, Tipidou et les gourmands de passage.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="personnages" class="section characters-section">
+        <div class="section-heading">
+          <p class="eyebrow">Grande bande</p>
+          <h2>Les Personnages</h2>
+          <p>Un répertoire tendre pour retrouver rapidement les amis de Coco Feutre.</p>
+        </div>
+
+        <div class="character-tools">
+          <label class="search-box" for="characterSearch">
+            <span>Recherche</span>
+            <input id="characterSearch" type="search" placeholder="Fifi, Tricotine, Océan..." autocomplete="off">
+          </label>
+          <div class="count-pill" id="characterCount">0 amis</div>
+        </div>
+
+        <div class="character-grid" id="characterGrid"></div>
+      </section>
+
+      <section id="galerie" class="section gallery-section">
+        <div class="section-heading">
+          <p class="eyebrow">Carnet coloré</p>
+          <h2>Images De L'Univers</h2>
+          <p>Des scènes de boulangerie, de fête, de prairie, de ferme et de forêt.</p>
+        </div>
+
+        <div class="gallery-grid">
+          <figure class="gallery-item wide">
+            <img src="assets/hero-univers.png" alt="Grande réunion des personnages Coco Feutre dans les nuages">
+            <figcaption>La grande bande Coco Feutre</figcaption>
+          </figure>
+          <figure class="gallery-item tall">
+            <img src="assets/ville-foret-plan.png" alt="Plan illustré de la Ville-Forêt">
+            <figcaption>Plan de la Ville-Forêt</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/atelier-fifi.png" alt="Atelier de Fifi avec personnages et agrumes dansants">
+            <figcaption>L'atelier de Fifi</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/fifi-patisseries.png" alt="Fifi avec un plateau de pâtisseries">
+            <figcaption>Les pâtisseries de Fifi</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/bonbons-cassants.png" alt="Bonbons cassants dans la boutique">
+            <figcaption>Les bonbons cassants</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/vitrine-biscottes.png" alt="Vitrine de biscottes et petits beurre">
+            <figcaption>La vitrine gourmande</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/tricotine-dj.png" alt="Tricotine aux platines">
+            <figcaption>Tricotine DJ</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/arc-en-ciel-fete.png" alt="Fête sur un arc-en-ciel">
+            <figcaption>Fête dans les nuages</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/tipidou-jardin.png" alt="Tipidou court dans un jardin fruité">
+            <figcaption>Le jardin de Tipidou</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/ferme-patates.png" alt="Fête dans un champ de pommes de terre">
+            <figcaption>La Ferme Foin-Foin</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/prairie-danse.png" alt="Galipo et Gros Matou dansent dans une prairie">
+            <figcaption>Danse dans la prairie</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/gulo-fraises.png" alt="Gulo-Gulo mange une fraise dans la forêt">
+            <figcaption>Gulo-Gulo aux fraises</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/tapotin-montagne.png" alt="Tapotin explore la Montagne Bibi dans une grotte">
+            <figcaption>Tapotin explore la Montagne Bibi</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/ocean-bisou.png" alt="Poulpossa et Petit Colin dans le Royaume de l'Océan">
+            <figcaption>Le Royaume de l'Océan</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/zezula-brousse.png" alt="Zezula observe la Brousse">
+            <figcaption>Zezula dans la Brousse</figcaption>
+          </figure>
+          <figure class="gallery-item wide">
+            <img src="assets/brousse-amis.png" alt="Zezula, Pantatou et Boulbou dans la Brousse">
+            <figcaption>Les amis de la Brousse</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/coloriage-ocean.png" alt="Coloriage océan avec pieuvre, baleine et château">
+            <figcaption>Coloriage de l'Océan</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/rififou-fruits.png" alt="Rififou court vers un panier de fruits">
+            <figcaption>Rififou et les fruits</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/badada-nuages.png" alt="Badada vole dans les nuages">
+            <figcaption>Badada dans les nuages</figcaption>
+          </figure>
+          <figure class="gallery-item wide">
+            <img src="assets/bonbons-bouzous.png" alt="Personnages dans les bonbons Bouzous">
+            <figcaption>Les bonbons Bouzous</figcaption>
+          </figure>
+          <figure class="gallery-item">
+            <img src="assets/canono-jardin.png" alt="Canono jardine dans un potager joyeux">
+            <figcaption>Canono au jardin</figcaption>
+          </figure>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Coco Feutre — chansons, gourmandise, fantaisie et humour doux.</p>
+    </footer>
+
+    <div class="lightbox" id="imageLightbox" aria-hidden="true">
+      <div class="lightbox-panel" role="dialog" aria-modal="true" aria-label="Image agrandie">
+        <div class="lightbox-tools">
+          <p id="lightboxCaption">Image Coco Feutre</p>
+          <div class="lightbox-buttons">
+            <button type="button" class="lightbox-button" data-zoom="out" aria-label="Réduire le zoom">-</button>
+            <button type="button" class="lightbox-button" data-zoom="reset" aria-label="Réinitialiser le zoom">100%</button>
+            <button type="button" class="lightbox-button" data-zoom="in" aria-label="Agrandir l'image">+</button>
+            <button type="button" class="lightbox-button close-lightbox" aria-label="Fermer l'image">x</button>
+          </div>
+        </div>
+        <div class="lightbox-stage">
+          <img id="lightboxImage" src="" alt="">
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

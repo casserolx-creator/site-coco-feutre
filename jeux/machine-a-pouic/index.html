@@ -1,0 +1,60 @@
+﻿<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Machine Coco Feutre</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="workshop" aria-live="polite">
+      <section class="machine" aria-label="Machine Coco Feutre à boutons rigolos">
+        <a class="quit-button" href="../../" aria-label="Quitter la Machine à Pouic et revenir à Coco Feutre">QUITTER</a>
+        <header class="machine__top">
+          <div class="antenna antenna--left"></div>
+          <div>
+            <p class="eyebrow">Machine magique à surprises</p>
+            <h1>Machine Coco Feutre</h1>
+          </div>
+          <div class="antenna antenna--right"></div>
+        </header>
+
+        <div class="machine__body">
+          <section class="screen-zone" aria-label="Ecran des surprises">
+            <div class="screen">
+              <img id="surpriseImage" src="assets/images/magic-toy-machine.png" alt="Illustration surprise Coco Feutre" />
+              <div class="screen__shine"></div>
+              <div id="sparkles" class="sparkles" aria-hidden="true"></div>
+            </div>
+            <div class="ticker">
+              <span id="surpriseTitle">Prête pour un bouton rigolo</span>
+              <span id="surpriseMode">hasard royal</span>
+            </div>
+          </section>
+
+          <aside class="control-tower" aria-label="Commandes de la machine">
+            <button class="lever" id="megaButton" type="button">
+              <span class="lever__ball"></span>
+              <span>Mega pouic</span>
+            </button>
+
+            <label class="volume" for="volumeControl">
+              <span class="volume__head">
+                <span>Volume</span>
+                <strong id="volumeReadout">1200%</strong>
+              </span>
+              <input id="volumeControl" type="range" min="0" max="3000" step="50" value="1200" />
+              <span class="volume__joke">3000% pour de faux, magie pour de vrai</span>
+            </label>
+
+            <button class="tiny-command" id="stopButton" type="button">Chut doux</button>
+          </aside>
+        </div>
+
+        <section class="button-field" id="buttonField" aria-label="Boutons surprises"></section>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
