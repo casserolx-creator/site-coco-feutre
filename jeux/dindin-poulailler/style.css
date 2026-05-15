@@ -1,0 +1,436 @@
+:root {
+  --ink: #1d1720;
+  --sky: #7bdfff;
+  --grass: #5de35f;
+  --grass-dark: #31b847;
+  --sun: #ffd642;
+  --wood: #ff7a2f;
+  --blue: #24b8ff;
+  --cream: #fff5c2;
+  --panel: #fffdf0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+  background: #56c9ff;
+}
+
+button {
+  color: var(--ink);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  border: 4px solid var(--ink);
+  box-shadow: 0 5px 0 var(--ink);
+  touch-action: manipulation;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+}
+
+button:hover,
+button:focus-visible,
+.site-link:hover,
+.site-link:focus-visible {
+  filter: saturate(1.12) brightness(1.04);
+  transform: translateY(-1px);
+}
+
+button:focus-visible,
+.site-link:focus-visible {
+  outline: 4px solid #fff56b;
+  outline-offset: 3px;
+}
+
+button:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.shell {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 16px;
+}
+
+.screen {
+  width: min(1120px, 100%);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.title-screen {
+  display: grid;
+  align-content: end;
+  justify-items: center;
+  gap: 18px;
+  min-height: calc(100vh - 32px);
+  padding: clamp(18px, 4vw, 42px);
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 0 46%, rgba(255, 249, 224, 0.82) 70%, rgba(255, 249, 224, 0.96) 100%),
+    url("./assets/menu-dindin.png") center / cover no-repeat;
+  border: 5px solid var(--ink);
+  border-radius: 8px;
+}
+
+.site-link {
+  padding: 8px 14px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 4px solid var(--ink);
+  border-radius: 8px;
+  box-shadow: 0 4px 0 var(--ink);
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.title-screen h1 {
+  width: min(760px, 100%);
+  margin: 0;
+  font-size: clamp(2.2rem, 7vw, 5rem);
+  line-height: 0.95;
+  text-shadow: 0 4px 0 #fff7aa, 0 8px 0 var(--ink);
+}
+
+.title-screen p {
+  margin: 0;
+  padding: 8px 18px;
+  border: 4px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.title-art {
+  display: none;
+}
+
+.title-art span {
+  position: absolute;
+  display: block;
+  border: 5px solid var(--ink);
+}
+
+.title-art .sun {
+  top: 18px;
+  right: 54px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--sun);
+}
+
+.title-art .coop {
+  left: 54px;
+  bottom: 34px;
+  width: 170px;
+  height: 118px;
+  border-radius: 8px 8px 0 0;
+  background: var(--wood);
+}
+
+.title-art .coop::before {
+  position: absolute;
+  inset: -54px -18px auto;
+  height: 62px;
+  content: "";
+  border: 5px solid var(--ink);
+  background: #ff3f58;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.title-art .dindin {
+  right: 218px;
+  bottom: 36px;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+
+.title-art .dindin::before,
+.title-art .dindin::after {
+  position: absolute;
+  content: "";
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.title-art .dindin::before {
+  top: 19px;
+  left: 18px;
+  width: 14px;
+  height: 14px;
+}
+
+.title-art .dindin::after {
+  top: 19px;
+  right: 18px;
+  width: 14px;
+  height: 14px;
+}
+
+.title-art .hay {
+  right: 70px;
+  bottom: 42px;
+  width: 118px;
+  height: 58px;
+  border-radius: 8px;
+  background: #ffe14d;
+}
+
+.primary-button {
+  min-width: 190px;
+  padding: 16px 28px;
+  border-radius: 8px;
+  background: #ff4b67;
+  font-size: 1.45rem;
+}
+
+.title-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.sound-button {
+  min-width: 130px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: #fff56b;
+  font-size: 1.1rem;
+}
+
+.final-screen {
+  position: relative;
+  display: grid;
+  min-height: calc(100vh - 32px);
+  place-items: center;
+  padding: clamp(18px, 4vw, 42px);
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 248, 210, 0.36)),
+    url("./assets/fin-dindin.png") center / cover no-repeat,
+    #f7d56c;
+  border: 5px solid var(--ink);
+  border-radius: 8px;
+}
+
+.final-sound-button {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  min-width: 112px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+}
+
+.final-panel {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(560px, 100%);
+  padding: clamp(18px, 4vw, 30px);
+  border: 5px solid var(--ink);
+  border-radius: 8px;
+  background: rgba(255, 253, 240, 0.92);
+  box-shadow: 0 8px 0 var(--ink);
+}
+
+.final-panel h2 {
+  margin: 0;
+  font-size: clamp(2.6rem, 10vw, 5.6rem);
+  line-height: 0.95;
+  text-shadow: 0 4px 0 #ffe758;
+}
+
+.final-panel p {
+  margin: 0;
+  font-size: clamp(1rem, 4vw, 1.45rem);
+  font-weight: 900;
+}
+
+.final-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.game-screen {
+  display: grid;
+  gap: 12px;
+}
+
+.hud {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-pill,
+.clean-meter,
+.menu-button {
+  min-height: 44px;
+  border: 4px solid var(--ink);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.hud-pill {
+  display: grid;
+  align-items: center;
+  padding: 0 14px;
+  font-weight: 900;
+}
+
+.clean-meter {
+  overflow: hidden;
+  background: #fff;
+}
+
+.clean-meter span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #18cf62, #e6ff58);
+  transition: width 180ms ease;
+}
+
+.menu-button {
+  padding: 0 16px;
+  box-shadow: none;
+}
+
+.stage-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  max-height: calc(100vh - 170px);
+  overflow: hidden;
+  border: 5px solid var(--ink);
+  border-radius: 8px;
+  background: var(--grass);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.victory {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  text-align: center;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 248, 210, 0.78)),
+    url("./assets/fin-dindin.png") center / cover no-repeat;
+  animation: pop 650ms ease both;
+}
+
+.victory strong {
+  font-size: clamp(2.4rem, 9vw, 6rem);
+  text-shadow: 0 5px 0 #ffe758, 0 10px 0 var(--ink);
+}
+
+.victory span {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  font-weight: 900;
+}
+
+.mobile-pad {
+  display: none;
+  grid-template-columns: 64px 64px 64px;
+  grid-template-areas:
+    ". up ."
+    "left down right";
+  justify-content: center;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
+.mobile-pad button {
+  width: 68px;
+  height: 62px;
+  border-radius: 8px;
+  background: #fff56b;
+  font-size: 1.6rem;
+  user-select: none;
+}
+
+.mobile-pad [data-dir="up"] {
+  grid-area: up;
+}
+
+.mobile-pad [data-dir="left"] {
+  grid-area: left;
+}
+
+.mobile-pad [data-dir="down"] {
+  grid-area: down;
+}
+
+.mobile-pad [data-dir="right"] {
+  grid-area: right;
+}
+
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .shell {
+    align-content: start;
+    padding: 10px;
+  }
+
+  .hud {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .clean-meter {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .menu-button {
+    min-height: 44px;
+  }
+
+  .stage-wrap {
+    max-height: none;
+  }
+
+  .mobile-pad {
+    display: grid;
+  }
+}

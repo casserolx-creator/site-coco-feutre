@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dindin et le Poulailler Tout Cracra</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section id="titleScreen" class="screen title-screen">
+        <a class="site-link" href="../../index.html">Retour au site Coco Feutre</a>
+        <div class="title-art" aria-hidden="true">
+          <span class="sun"></span>
+          <span class="coop"></span>
+          <span class="dindin"></span>
+          <span class="hay"></span>
+        </div>
+        <h1>Dindin et le Poulailler Tout Cracra</h1>
+        <p>Coco Feutre, Ferme Foin-Foin</p>
+        <div class="title-actions">
+          <button id="playButton" class="primary-button">JOUER</button>
+          <button id="soundButton" class="sound-button" type="button">SON ON</button>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="screen game-screen hidden">
+        <header class="hud">
+          <div class="hud-pill">Niveau <span id="levelLabel">1</span></div>
+          <div class="clean-meter" aria-label="Jauge de proprete">
+            <span id="cleanBar"></span>
+          </div>
+          <div class="hud-pill"><span id="cleanLabel">0</span>% propre</div>
+          <button id="menuButton" class="menu-button">Menu</button>
+        </header>
+
+        <div class="stage-wrap">
+          <canvas id="gameCanvas" width="960" height="600" aria-label="Jeu Dindin"></canvas>
+          <div id="victoryBanner" class="victory hidden">
+            <strong>Glou-glou !</strong>
+            <span>Poulailler presque tout propre</span>
+          </div>
+        </div>
+
+        <nav class="mobile-pad" aria-label="Commandes mobiles">
+          <button data-dir="up">&uarr;</button>
+          <button data-dir="left">&larr;</button>
+          <button data-dir="down">&darr;</button>
+          <button data-dir="right">&rarr;</button>
+        </nav>
+      </section>
+
+      <section id="finalScreen" class="screen final-screen hidden">
+        <button id="finalSoundButton" class="sound-button final-sound-button" type="button">SON ON</button>
+        <div class="final-panel">
+          <h2>Bravo !</h2>
+          <p>Le poulailler est tout joyeux !</p>
+          <div class="final-actions">
+            <button id="replayButton" class="primary-button" type="button">REJOUER</button>
+            <button id="finalMenuButton" class="sound-button" type="button">MENU</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./src/audioManager.js"></script>
+    <script src="./game.js"></script>
+  </body>
+</html>
