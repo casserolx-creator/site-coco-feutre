@@ -67,16 +67,17 @@ const WORLD = {
 };
 
 const ASSETS = {
-  dindin: "./assets/dindin-dindin.png",
-  ground: makeSheetSprites("./assets/sols-dindin.png", 3, 2, 6),
-  hay: makeSheetSprites("./assets/bottefoin-dindin.png", 5, 5, 25),
-  coop: makeSheetSprites("./assets/cabane-dindin.png", 4, 4, 16),
-  fence: makeSheetSprites("./assets/mur-dindin.png", 4, 5, 20),
-  chicken: makeSheetSprites("./assets/poules-dindin.png", 3, 4, 10),
-  dirt: makeSheetSprites("./assets/traces-dindin.png", 7, 4, 28),
+  dindin: makeSingleSprite("./assets/dindin-dindin.png", { transparentBackground: true, trim: true, cropInsetX: 0.03, cropInsetY: 0.03 }),
+  ground: makeSheetSprites("./assets/sols-dindin.png", 3, 2, 6, { cropInsetX: 0.07, cropInsetY: 0.08, keepBackground: true }),
+  hay: makeSheetSprites("./assets/bottefoin-dindin.png", 5, 5, 25, { cropInsetX: 0.07, cropInsetY: 0.06, transparentBackground: true, trim: true }),
+  coop: makeSheetSprites("./assets/cabane-dindin.png", 4, 4, 16, { cropInsetX: 0.03, cropInsetY: 0.03, transparentBackground: true, trim: true }),
+  fence: makeSheetSprites("./assets/mur-dindin.png", 4, 5, 20, { cropInsetX: 0.06, cropInsetY: 0.06, transparentBackground: true, trim: true }),
+  chicken: makeSheetSprites("./assets/poules-dindin.png", 3, 4, 10, { cropInsetX: 0.07, cropInsetY: 0.06, transparentBackground: true, trim: true }),
+  dirt: makeSheetSprites("./assets/traces-dindin.png", 7, 4, 28, { cropInsetX: 0.04, cropInsetY: 0.04, transparentBackground: true, backgroundThreshold: 218, trim: true }),
 };
 
 const images = new Map();
+const spriteCache = new Map();
 let assetsReady = false;
 let gameState = "menu";
 let lastTime = 0;
@@ -154,12 +155,23 @@ function playVictorySound() {
   manager.playSound("click", { volume: 0.35 });
 }
 
-function makeSheetSprites(sheet, columns, rows, count) {
+function makeSingleSprite(sheet, options = {}) {
+  return makeSheetSprites(sheet, 1, 1, 1, options)[0];
+}
+
+function makeSheetSprites(sheet, columns, rows, count, options = {}) {
   return Array.from({ length: count }, (_, index) => ({
     sheet,
     columns,
     rows,
     index,
+    cropInsetX: options.cropInsetX || 0,
+    cropInsetY: options.cropInsetY || 0,
+    transparentBackground: Boolean(options.transparentBackground),
+    backgroundThreshold: options.backgroundThreshold || 226,
+    keepBackground: Boolean(options.keepBackground),
+    trim: Boolean(options.trim),
+    trimPadding: options.trimPadding === undefined ? 3 : options.trimPadding,
   }));
 }
 
@@ -201,6 +213,140 @@ function uniquePaths(assets) {
 
 function img(asset) {
   return images.get(assetPath(asset));
+}
+
+function spriteKey(sprite) {
+  return [
+    sprite.sheet,
+    sprite.columns,
+    sprite.rows,
+    sprite.index,
+    sprite.cropInsetX,
+    sprite.cropInsetY,
+    sprite.transparentBackground,
+    sprite.backgroundThreshold,
+    sprite.keepBackground,
+    sprite.trim,
+  ].join("|");
+}
+
+function getSpriteCanvas(sprite) {
+  const image = img(sprite);
+  if (!image) return null;
+
+  const key = spriteKey(sprite);
+  if (spriteCache.has(key)) return spriteCache.get(key);
+
+  const cellWidth = image.width / sprite.columns;
+  const cellHeight = image.height / sprite.rows;
+  const insetX = cellWidth * sprite.cropInsetX;
+  const insetY = cellHeight * sprite.cropInsetY;
+  const sourceX = (sprite.index % sprite.columns) * cellWidth + insetX;
+  const sourceY = Math.floor(sprite.index / sprite.columns) * cellHeight + insetY;
+  const sourceWidth = Math.max(1, cellWidth - insetX * 2);
+  const sourceHeight = Math.max(1, cellHeight - insetY * 2);
+  const canvasSprite = document.createElement("canvas");
+  canvasSprite.width = Math.max(1, Math.round(sourceWidth));
+  canvasSprite.height = Math.max(1, Math.round(sourceHeight));
+  const spriteCtx = canvasSprite.getContext("2d", { willReadFrequently: true });
+  spriteCtx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, canvasSprite.width, canvasSprite.height);
+
+  let prepared = canvasSprite;
+  if (sprite.transparentBackground && !sprite.keepBackground) {
+    removeEdgeBackground(prepared, sprite.backgroundThreshold);
+  }
+  if (sprite.trim) {
+    prepared = trimTransparentSprite(prepared, sprite.trimPadding);
+  }
+
+  spriteCache.set(key, prepared);
+  return prepared;
+}
+
+function isBackgroundPixel(data, offset, threshold) {
+  const alpha = data[offset + 3];
+  if (alpha < 10) return true;
+  const red = data[offset];
+  const green = data[offset + 1];
+  const blue = data[offset + 2];
+  return red >= threshold && green >= threshold && blue >= threshold;
+}
+
+function removeEdgeBackground(spriteCanvas, threshold) {
+  const width = spriteCanvas.width;
+  const height = spriteCanvas.height;
+  const spriteCtx = spriteCanvas.getContext("2d", { willReadFrequently: true });
+  const imageData = spriteCtx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  const visited = new Uint8Array(width * height);
+  const stack = [];
+
+  function addIfBackground(x, y) {
+    if (x < 0 || y < 0 || x >= width || y >= height) return;
+    const index = y * width + x;
+    if (visited[index]) return;
+    const offset = index * 4;
+    if (!isBackgroundPixel(data, offset, threshold)) return;
+    visited[index] = 1;
+    stack.push(index);
+  }
+
+  for (let x = 0; x < width; x += 1) {
+    addIfBackground(x, 0);
+    addIfBackground(x, height - 1);
+  }
+  for (let y = 0; y < height; y += 1) {
+    addIfBackground(0, y);
+    addIfBackground(width - 1, y);
+  }
+
+  while (stack.length) {
+    const index = stack.pop();
+    data[index * 4 + 3] = 0;
+    const x = index % width;
+    const y = Math.floor(index / width);
+    addIfBackground(x + 1, y);
+    addIfBackground(x - 1, y);
+    addIfBackground(x, y + 1);
+    addIfBackground(x, y - 1);
+  }
+
+  spriteCtx.putImageData(imageData, 0, 0);
+}
+
+function trimTransparentSprite(spriteCanvas, padding) {
+  const width = spriteCanvas.width;
+  const height = spriteCanvas.height;
+  const spriteCtx = spriteCanvas.getContext("2d", { willReadFrequently: true });
+  const imageData = spriteCtx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (data[(y * width + x) * 4 + 3] <= 10) continue;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x);
+      maxY = Math.max(maxY, y);
+    }
+  }
+
+  if (maxX < minX || maxY < minY) return spriteCanvas;
+
+  minX = Math.max(0, minX - padding);
+  minY = Math.max(0, minY - padding);
+  maxX = Math.min(width - 1, maxX + padding);
+  maxY = Math.min(height - 1, maxY + padding);
+
+  const trimmed = document.createElement("canvas");
+  trimmed.width = Math.max(1, maxX - minX + 1);
+  trimmed.height = Math.max(1, maxY - minY + 1);
+  trimmed.getContext("2d").drawImage(spriteCanvas, minX, minY, trimmed.width, trimmed.height, 0, 0, trimmed.width, trimmed.height);
+  return trimmed;
 }
 
 function randomRange(min, max) {
@@ -790,11 +936,8 @@ function drawSprite(path, x, y, w, h, options = {}) {
   ctx.rotate(rotation);
   ctx.scale(flipX ? -1 : 1, 1);
   if (sheet) {
-    const sourceWidth = image.width / sheet.columns;
-    const sourceHeight = image.height / sheet.rows;
-    const sourceX = (sheet.index % sheet.columns) * sourceWidth;
-    const sourceY = Math.floor(sheet.index / sheet.columns) * sourceHeight;
-    ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, -w / 2, -h / 2, w, h);
+    const spriteCanvas = getSpriteCanvas(sheet);
+    if (spriteCanvas) ctx.drawImage(spriteCanvas, -w / 2, -h / 2, w, h);
   } else {
     ctx.drawImage(image, -w / 2, -h / 2, w, h);
   }
@@ -806,13 +949,9 @@ function drawBackground() {
   ctx.fillRect(0, 0, WORLD.width, WORLD.height);
 
   for (const tile of levelData.groundTiles) {
-    const image = img(tile.sprite);
-    if (!image) continue;
-    const sourceWidth = image.width / tile.sprite.columns;
-    const sourceHeight = image.height / tile.sprite.rows;
-    const sourceX = (tile.sprite.index % tile.sprite.columns) * sourceWidth;
-    const sourceY = Math.floor(tile.sprite.index / tile.sprite.columns) * sourceHeight;
-    ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, tile.x, tile.y, CONFIG.tileSize + 2, CONFIG.tileSize + 2);
+    const spriteCanvas = getSpriteCanvas(tile.sprite);
+    if (!spriteCanvas) continue;
+    ctx.drawImage(spriteCanvas, tile.x, tile.y, CONFIG.tileSize + 2, CONFIG.tileSize + 2);
   }
 }
 
