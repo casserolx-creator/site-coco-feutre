@@ -83,6 +83,8 @@ const SAMPLE_COUNT = 76;
 const DONE_AT = 0.92;
 const SNAP_AT = 0.82;
 const ELASTIC_BACK = 0.14;
+const ALMOST_AT = 0.64;
+const PULL_SMOOTHING = 0.34;
 const VIEWBOX = { width: 240, height: 205 };
 const board = document.querySelector("#board");
 const doneCount = document.querySelector("#done-count");
@@ -106,6 +108,10 @@ function lerp(a, b, t) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function distanceBetween(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
 function easeOutCubic(t) {
@@ -185,12 +191,12 @@ function cloverPoints() {
 }
 
 function briochePoints() {
-  return Array.from({ length: 84 }, (_, index) => {
+  return Array.from({ length: 80 }, (_, index) => {
     const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 84;
-    const radius = 48 + 16 * Math.cos(2 * angle);
+    const radius = 50 + 12 * Math.cos(2 * angle);
     return {
-      x: 120 + Math.cos(angle) * radius * 1.18,
-      y: 118 + Math.sin(angle) * radius * 0.9 + Math.sin(2 * angle) * 6
+      x: 120 + Math.cos(angle) * radius * 1.08,
+      y: 118 + Math.sin(angle) * radius * 0.86 + Math.sin(2 * angle) * 5
     };
   });
 }
@@ -250,41 +256,39 @@ function bearPoints() {
 
 function dogPoints() {
   return [
-    { x: 48, y: 124 },
-    { x: 62, y: 91 },
-    { x: 86, y: 82 },
-    { x: 99, y: 55 },
-    { x: 116, y: 82 },
-    { x: 144, y: 81 },
-    { x: 160, y: 55 },
-    { x: 177, y: 84 },
-    { x: 198, y: 104 },
-    { x: 184, y: 129 },
-    { x: 160, y: 139 },
-    { x: 151, y: 162 },
-    { x: 123, y: 169 },
-    { x: 99, y: 158 },
-    { x: 80, y: 168 },
-    { x: 62, y: 146 }
+    { x: 55, y: 121 },
+    { x: 65, y: 88 },
+    { x: 92, y: 72 },
+    { x: 106, y: 52 },
+    { x: 121, y: 78 },
+    { x: 145, y: 76 },
+    { x: 162, y: 53 },
+    { x: 176, y: 86 },
+    { x: 191, y: 114 },
+    { x: 174, y: 140 },
+    { x: 148, y: 151 },
+    { x: 123, y: 164 },
+    { x: 96, y: 151 },
+    { x: 70, y: 143 }
   ];
 }
 
 function giraffePoints() {
   return [
-    { x: 64, y: 146 },
-    { x: 74, y: 98 },
-    { x: 90, y: 82 },
-    { x: 94, y: 48 },
-    { x: 110, y: 68 },
-    { x: 125, y: 47 },
-    { x: 137, y: 78 },
+    { x: 70, y: 153 },
+    { x: 82, y: 99 },
+    { x: 96, y: 78 },
+    { x: 99, y: 50 },
+    { x: 114, y: 68 },
+    { x: 129, y: 49 },
+    { x: 140, y: 79 },
     { x: 165, y: 84 },
-    { x: 188, y: 104 },
-    { x: 176, y: 132 },
-    { x: 150, y: 139 },
-    { x: 141, y: 166 },
-    { x: 106, y: 166 },
-    { x: 93, y: 144 }
+    { x: 185, y: 106 },
+    { x: 174, y: 132 },
+    { x: 147, y: 141 },
+    { x: 137, y: 165 },
+    { x: 105, y: 165 },
+    { x: 93, y: 143 }
   ];
 }
 
@@ -305,64 +309,64 @@ function hourglassPoints() {
 
 function headphonesPoints() {
   return [
-    { x: 62, y: 154 },
-    { x: 52, y: 154 },
-    { x: 52, y: 112 },
-    { x: 64, y: 102 },
-    { x: 70, y: 84 },
-    { x: 92, y: 62 },
-    { x: 120, y: 55 },
-    { x: 148, y: 62 },
-    { x: 170, y: 84 },
-    { x: 176, y: 102 },
-    { x: 188, y: 112 },
-    { x: 188, y: 154 },
-    { x: 178, y: 154 },
-    { x: 166, y: 130 },
-    { x: 161, y: 105 },
-    { x: 144, y: 86 },
-    { x: 120, y: 80 },
-    { x: 96, y: 86 },
-    { x: 79, y: 105 },
-    { x: 74, y: 130 }
+    { x: 56, y: 155 },
+    { x: 56, y: 112 },
+    { x: 67, y: 104 },
+    { x: 72, y: 88 },
+    { x: 94, y: 63 },
+    { x: 120, y: 56 },
+    { x: 146, y: 63 },
+    { x: 168, y: 88 },
+    { x: 173, y: 104 },
+    { x: 184, y: 112 },
+    { x: 184, y: 155 },
+    { x: 163, y: 155 },
+    { x: 157, y: 111 },
+    { x: 142, y: 91 },
+    { x: 120, y: 84 },
+    { x: 98, y: 91 },
+    { x: 83, y: 111 },
+    { x: 77, y: 155 }
   ];
 }
 
 function spadePoints() {
   return [
     { x: 120, y: 44 },
-    { x: 154, y: 74 },
-    { x: 181, y: 105 },
-    { x: 170, y: 140 },
-    { x: 139, y: 143 },
+    { x: 157, y: 77 },
+    { x: 181, y: 111 },
+    { x: 166, y: 143 },
+    { x: 137, y: 143 },
     { x: 151, y: 169 },
-    { x: 90, y: 169 },
-    { x: 102, y: 143 },
-    { x: 70, y: 140 },
-    { x: 59, y: 105 },
-    { x: 86, y: 74 }
+    { x: 89, y: 169 },
+    { x: 103, y: 143 },
+    { x: 74, y: 143 },
+    { x: 59, y: 111 },
+    { x: 83, y: 77 }
   ];
 }
 
 function crownPoints() {
   return [
     { x: 55, y: 158 },
-    { x: 61, y: 86 },
-    { x: 91, y: 120 },
-    { x: 119, y: 56 },
-    { x: 148, y: 120 },
-    { x: 179, y: 86 },
-    { x: 185, y: 158 }
+    { x: 59, y: 88 },
+    { x: 91, y: 122 },
+    { x: 120, y: 58 },
+    { x: 149, y: 122 },
+    { x: 181, y: 88 },
+    { x: 185, y: 158 },
+    { x: 145, y: 148 },
+    { x: 95, y: 148 }
   ];
 }
 
 function victoryVPoints() {
   return [
-    { x: 51, y: 58 },
-    { x: 86, y: 58 },
+    { x: 53, y: 57 },
+    { x: 88, y: 57 },
     { x: 120, y: 144 },
-    { x: 154, y: 58 },
-    { x: 189, y: 58 },
+    { x: 152, y: 57 },
+    { x: 187, y: 57 },
     { x: 136, y: 174 },
     { x: 104, y: 174 }
   ];
@@ -502,13 +506,42 @@ function updateCard(state) {
   state.rightEye.setAttribute("cy", face.y);
   state.mouth.setAttribute("d", face.smile);
   state.face.setAttribute("transform", `scale(${face.scale} ${face.scale}) translate(${(state.center.x / face.scale - state.center.x).toFixed(2)} 0)`);
-  state.card.classList.toggle("is-almost", state.progress >= 0.62 && !state.done);
+  state.card.classList.toggle("is-almost", state.progress >= ALMOST_AT && !state.done);
+}
+
+function requestDragRender(state) {
+  if (state.dragFrame || state.done) {
+    return;
+  }
+
+  state.dragFrame = window.requestAnimationFrame(() => {
+    state.dragFrame = null;
+    state.pull = {
+      x: lerp(state.pull.x, state.targetPull.x, PULL_SMOOTHING),
+      y: lerp(state.pull.y, state.targetPull.y, PULL_SMOOTHING)
+    };
+    updateCard(state);
+
+    if (state.dragging && distanceBetween(state.pull, state.targetPull) > 0.4) {
+      requestDragRender(state);
+    }
+  });
 }
 
 function stopAnimation(state) {
   if (state.animationFrame) {
     window.cancelAnimationFrame(state.animationFrame);
     state.animationFrame = null;
+  }
+
+  if (state.dragFrame) {
+    window.cancelAnimationFrame(state.dragFrame);
+    state.dragFrame = null;
+  }
+
+  if (state.snapFallback) {
+    window.clearTimeout(state.snapFallback);
+    state.snapFallback = null;
   }
 }
 
@@ -550,13 +583,25 @@ function snapToTarget(state) {
 
   state.snapping = true;
   state.dragging = false;
+  state.targetPull = { x: 0, y: 0 };
   state.card.classList.remove("is-dragging");
   statusMessage.textContent = "Hop, la pâte trouve son contour toute seule !";
 
   animateDough(state, 1, { x: 0, y: 0 }, 520, () => {
+    if (state.snapFallback) {
+      window.clearTimeout(state.snapFallback);
+      state.snapFallback = null;
+    }
     state.snapping = false;
     completeCard(state);
   });
+
+  state.snapFallback = window.setTimeout(() => {
+    if (!state.done && state.snapping) {
+      state.snapping = false;
+      completeCard(state);
+    }
+  }, 680);
 }
 
 function showLevelComplete(level) {
@@ -574,6 +619,7 @@ function completeCard(state) {
   state.done = true;
   state.progress = 1;
   state.pull = { x: 0, y: 0 };
+  state.targetPull = { x: 0, y: 0 };
   state.card.classList.add("is-complete");
   state.card.classList.add("is-success");
   state.card.classList.remove("is-almost");
@@ -618,7 +664,7 @@ function updatePullFromPointer(event, state) {
   const maxPull = 34;
   const scale = distance > maxPull ? maxPull / distance : 1;
 
-  state.pull = {
+  state.targetPull = {
     x: dx * scale,
     y: dy * scale
   };
@@ -629,13 +675,15 @@ function onPointerDown(event, state) {
     return;
   }
 
+  event.preventDefault();
   stopAnimation(state);
   state.dragging = true;
   state.pointerId = event.pointerId;
   state.lastX = event.clientX;
   state.lastY = event.clientY;
+  state.lastMove = { x: 0, y: 0 };
   updatePullFromPointer(event, state);
-  updateCard(state);
+  requestDragRender(state);
   state.card.classList.add("is-dragging");
   state.card.setPointerCapture(event.pointerId);
 }
@@ -645,6 +693,7 @@ function onPointerMove(event, state) {
     return;
   }
 
+  event.preventDefault();
   const dx = event.clientX - state.lastX;
   const dy = event.clientY - state.lastY;
   const pull = Math.hypot(dx, dy);
@@ -653,9 +702,10 @@ function onPointerMove(event, state) {
   updatePullFromPointer(event, state);
   state.progress = clamp(state.progress + (pull * directionBonus) / 610, 0, 1);
   state.wobble += pull / 32;
+  state.lastMove = { x: dx, y: dy };
   state.lastX = event.clientX;
   state.lastY = event.clientY;
-  updateCard(state);
+  requestDragRender(state);
 
   if (state.progress >= SNAP_AT) {
     snapToTarget(state);
@@ -667,6 +717,7 @@ function onPointerEnd(event, state) {
     return;
   }
 
+  event.preventDefault();
   state.dragging = false;
   state.card.classList.remove("is-dragging");
 
@@ -682,9 +733,44 @@ function onPointerEnd(event, state) {
       return;
     }
 
+    const drift = Math.min(14, Math.hypot(state.lastMove.x, state.lastMove.y) * 0.32);
+    const driftPull = Math.hypot(state.lastMove.x, state.lastMove.y) > 0
+      ? {
+          x: (state.lastMove.x / Math.hypot(state.lastMove.x, state.lastMove.y)) * drift,
+          y: (state.lastMove.y / Math.hypot(state.lastMove.x, state.lastMove.y)) * drift
+        }
+      : { x: 0, y: 0 };
     const elasticProgress = Math.max(0, state.progress - ELASTIC_BACK);
-    animateDough(state, elasticProgress, { x: 0, y: 0 }, 360);
+    animateDough(state, elasticProgress, driftPull, 150, () => {
+      animateDough(state, elasticProgress, { x: 0, y: 0 }, 300);
+    });
   }
+}
+
+function closestPlayableCard(event) {
+  let closest = null;
+  let closestDistance = Infinity;
+
+  cards.forEach((state) => {
+    if (state.done || state.snapping) {
+      return;
+    }
+
+    const box = state.card.getBoundingClientRect();
+    const center = {
+      x: box.left + box.width / 2,
+      y: box.top + box.height / 2
+    };
+    const distance = Math.hypot(event.clientX - center.x, event.clientY - center.y);
+    const allowed = Math.max(box.width, box.height) * 0.72;
+
+    if (distance < allowed && distance < closestDistance) {
+      closest = state;
+      closestDistance = distance;
+    }
+  });
+
+  return closest;
 }
 
 function applyPosition(card, shape) {
@@ -764,13 +850,17 @@ function createCard(shape) {
     startPoints,
     progress: 0,
     pull: { x: 0, y: 0 },
+    targetPull: { x: 0, y: 0 },
     wobble: 0,
     dragging: false,
     snapping: false,
     pointerId: null,
     lastX: 0,
     lastY: 0,
+    lastMove: { x: 0, y: 0 },
     animationFrame: null,
+    dragFrame: null,
+    snapFallback: null,
     done: false
   };
 
@@ -807,6 +897,17 @@ function showMenu() {
 }
 
 renderLevel(0);
+
+board.addEventListener("pointerdown", (event) => {
+  if (event.target.closest(".dough-card")) {
+    return;
+  }
+
+  const state = closestPlayableCard(event);
+  if (state) {
+    onPointerDown(event, state);
+  }
+});
 
 startButton.addEventListener("click", () => {
   menuScreen.classList.add("is-hidden");
