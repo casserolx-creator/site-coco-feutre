@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Danse des Pâtons Magiques - Coco Feutre</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="game-shell" aria-labelledby="game-title">
+      <section id="menu-screen" class="screen screen-menu" aria-labelledby="menu-title">
+        <div class="screen-art" aria-hidden="true"></div>
+        <div class="screen-panel">
+          <p class="kicker">Boulangerie de Fifi le lapin</p>
+          <h1 id="menu-title">La Danse des Pâtons Magiques</h1>
+          <button id="start-button" class="primary-button" type="button">Jouer</button>
+        </div>
+      </section>
+
+      <header class="topbar">
+        <a class="back-button" href="../../index.html" aria-label="Retour au menu">
+          <span aria-hidden="true">‹</span>
+          Retour au menu
+        </a>
+        <div class="title-block">
+          <p class="kicker">Boulangerie de Fifi le lapin</p>
+          <h1 id="game-title">La Danse des Pâtons Magiques</h1>
+        </div>
+        <div class="score-pill" aria-live="polite">
+          <span id="done-count">0</span>/6
+        </div>
+      </header>
+
+      <section class="bakery-stage" aria-label="Table à pâtisser magique">
+        <div class="wall-decor" aria-hidden="true">
+          <span class="jar jar-one"></span>
+          <span class="jar jar-two"></span>
+          <span class="bun bun-one"></span>
+          <span class="bun bun-two"></span>
+        </div>
+
+        <div class="table">
+          <div class="table-pattern" aria-hidden="true"></div>
+          <div id="board" class="board" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <p id="status-message" class="status-message" aria-live="polite">
+        Attrape un pâton rond, puis tire doucement pour guider la pâte.
+      </p>
+
+      <section id="victory-screen" class="screen screen-victory is-hidden" aria-labelledby="victory-title" aria-live="polite">
+        <div class="screen-art" aria-hidden="true"></div>
+        <div class="screen-panel">
+          <p class="kicker">Fifi applaudit</p>
+          <h2 id="victory-title">Tous les pâtons sont prêts !</h2>
+          <button id="replay-button" class="primary-button" type="button">Rejouer</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
