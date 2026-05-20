@@ -179,6 +179,22 @@ h1 {
   letter-spacing: 0;
 }
 
+.level-name {
+  margin: 4px 0 0;
+  font-size: 16px;
+  color: #006b9f;
+  text-shadow: 2px 2px 0 #fff;
+}
+
+.screen-level {
+  background: rgba(255, 224, 51, 0.16);
+  backdrop-filter: blur(2px);
+}
+
+.screen-level .screen-panel {
+  animation: levelPop 520ms ease;
+}
+
 .bakery-stage {
   position: relative;
   aspect-ratio: 16 / 9;
@@ -314,16 +330,17 @@ h1 {
 .board {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
   height: 100%;
-  gap: clamp(8px, 1.5vw, 18px) clamp(14px, 2.3vw, 30px);
   padding-top: 0;
 }
 
 .dough-card {
-  position: relative;
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h);
+  transform: translate(-50%, -50%);
   min-height: 0;
   border: 0;
   border-radius: 16px;
@@ -332,7 +349,7 @@ h1 {
   overflow: hidden;
   touch-action: none;
   user-select: none;
-  transition: transform 160ms ease, background-color 160ms ease;
+  transition: background-color 160ms ease;
 }
 
 .dough-card:nth-child(2n) {
@@ -484,11 +501,21 @@ h1 {
 @keyframes cardBounce {
   0%,
   100% {
-    transform: translateY(0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
   }
 
   42% {
-    transform: translateY(-9px) scale(1.04);
+    transform: translate(-50%, calc(-50% - 9px)) scale(1.04);
+  }
+}
+
+@keyframes levelPop {
+  0% {
+    transform: translateY(18px) scale(0.94);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -574,12 +601,14 @@ h1 {
   }
 
   .board {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(3, minmax(0, 1fr));
-    gap: 14px;
+    height: 100%;
   }
 
   .dough-card {
+    left: var(--mx);
+    top: var(--my);
+    width: var(--mw);
+    height: var(--mh);
     min-height: 0;
   }
 

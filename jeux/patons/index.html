@@ -25,9 +25,10 @@
         <div class="title-block">
           <p class="kicker">Boulangerie de Fifi le lapin</p>
           <h1 id="game-title">La Danse des Pâtons Magiques</h1>
+          <p id="level-name" class="level-name">Niveau 1</p>
         </div>
         <div class="score-pill" aria-live="polite">
-          <span id="done-count">0</span>/6
+          <span id="done-count">0</span>/<span id="done-total">6</span>
         </div>
       </header>
 
@@ -48,6 +49,14 @@
       <p id="status-message" class="status-message" aria-live="polite">
         Attrape un pâton rond, puis tire doucement pour guider la pâte.
       </p>
+
+      <section id="level-complete-screen" class="screen screen-level is-hidden" aria-labelledby="level-complete-title" aria-live="polite">
+        <div class="screen-panel">
+          <p id="level-complete-kicker" class="kicker">Niveau réussi</p>
+          <h2 id="level-complete-title">Les pâtons dansent encore !</h2>
+          <button id="next-level-button" class="primary-button" type="button">Niveau suivant</button>
+        </div>
+      </section>
 
       <section id="victory-screen" class="screen screen-victory is-hidden" aria-labelledby="victory-title" aria-live="polite">
         <div class="screen-art" aria-hidden="true"></div>

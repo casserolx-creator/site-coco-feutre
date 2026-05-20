@@ -1,14 +1,80 @@
+const DESKTOP_SLOTS = [
+  { x: 17, y: 30, w: 27, h: 40 },
+  { x: 50, y: 30, w: 27, h: 40 },
+  { x: 83, y: 30, w: 27, h: 40 },
+  { x: 17, y: 65, w: 27, h: 40 },
+  { x: 50, y: 65, w: 27, h: 40 },
+  { x: 83, y: 65, w: 27, h: 40 }
+];
+
+const MOBILE_SLOTS = [
+  { x: 29, y: 18, w: 43, h: 28 },
+  { x: 71, y: 18, w: 43, h: 28 },
+  { x: 29, y: 50, w: 43, h: 28 },
+  { x: 71, y: 50, w: 43, h: 28 },
+  { x: 29, y: 82, w: 43, h: 28 },
+  { x: 71, y: 82, w: 43, h: 28 }
+];
+
+const DEFAULT_STARTS = [
+  { x: 120, y: 118, r: 40 },
+  { x: 120, y: 118, r: 41 },
+  { x: 120, y: 118, r: 39 },
+  { x: 120, y: 118, r: 42 },
+  { x: 120, y: 118, r: 40 },
+  { x: 120, y: 118, r: 41 }
+];
+
+function levelShape(slot, id, label, successLabel, kind) {
+  return {
+    id,
+    label,
+    successLabel,
+    kind,
+    position: DESKTOP_SLOTS[slot],
+    mobilePosition: MOBILE_SLOTS[slot],
+    start: DEFAULT_STARTS[slot]
+  };
+}
+
 const LEVELS = [
   {
-    id: 1,
+    id: "level1",
     name: "Niveau 1",
+    completeText: "Le niveau 1 est tout doré !",
     shapes: [
-      { id: "star", label: "Étoile", successLabel: "l'étoile", kind: "star" },
-      { id: "square", label: "Carré", successLabel: "le carré", kind: "square" },
-      { id: "diamond", label: "Losange", successLabel: "le losange", kind: "diamond" },
-      { id: "bird", label: "Oiseau", successLabel: "l'oiseau", kind: "bird" },
-      { id: "rabbit", label: "Lapin", successLabel: "le lapin", kind: "rabbit" },
-      { id: "bear", label: "Ours", successLabel: "l'ours", kind: "bear" }
+      levelShape(0, "star", "Étoile", "l'étoile", "star"),
+      levelShape(1, "square", "Carré", "le carré", "square"),
+      levelShape(2, "diamond", "Losange", "le losange", "diamond"),
+      levelShape(3, "bird", "Oiseau", "l'oiseau", "bird"),
+      levelShape(4, "rabbit", "Lapin", "le lapin", "rabbit"),
+      levelShape(5, "bear", "Ours", "l'ours", "bear")
+    ]
+  },
+  {
+    id: "level2",
+    name: "Niveau 2",
+    completeText: "Le niveau 2 sent la brioche magique !",
+    shapes: [
+      levelShape(0, "heart", "Cœur", "le cœur", "heart"),
+      levelShape(1, "dog", "Chien", "le chien", "dog"),
+      levelShape(2, "giraffe", "Girafe", "la girafe", "giraffe"),
+      levelShape(3, "brioche", "Brioche", "la brioche soufflée", "brioche"),
+      levelShape(4, "long-rectangle", "Rectangle", "le rectangle long", "longRectangle"),
+      levelShape(5, "oval-tart", "Tarte ovale", "la tarte ovale", "ovalTart")
+    ]
+  },
+  {
+    id: "level3",
+    name: "Niveau 3",
+    completeText: "Le niveau 3 fait une danse de victoire !",
+    shapes: [
+      levelShape(0, "hourglass", "Sablier", "le sablier", "hourglass"),
+      levelShape(1, "clover", "Trèfle", "le trèfle", "clover"),
+      levelShape(2, "headphones", "Casque", "le casque", "headphones"),
+      levelShape(3, "spade", "Pique", "le pique", "spade"),
+      levelShape(4, "crown", "Couronne", "la couronne", "crown"),
+      levelShape(5, "victory-v", "Victoire", "le V de victoire", "victoryV")
     ]
   }
 ];
@@ -18,16 +84,21 @@ const DONE_AT = 0.92;
 const SNAP_AT = 0.82;
 const ELASTIC_BACK = 0.14;
 const VIEWBOX = { width: 240, height: 205 };
-const DOUGH_CENTER = { x: 120, y: 118 };
 const board = document.querySelector("#board");
 const doneCount = document.querySelector("#done-count");
+const doneTotal = document.querySelector("#done-total");
 const statusMessage = document.querySelector("#status-message");
 const menuScreen = document.querySelector("#menu-screen");
+const levelCompleteScreen = document.querySelector("#level-complete-screen");
+const levelCompleteKicker = document.querySelector("#level-complete-kicker");
+const levelCompleteTitle = document.querySelector("#level-complete-title");
 const victoryScreen = document.querySelector("#victory-screen");
 const startButton = document.querySelector("#start-button");
+const nextLevelButton = document.querySelector("#next-level-button");
 const replayButton = document.querySelector("#replay-button");
-const currentLevel = LEVELS[0];
+const levelName = document.querySelector("#level-name");
 const cards = new Map();
+let currentLevelIndex = 0;
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
@@ -52,6 +123,16 @@ function circlePoints(cx, cy, radius, count) {
   return Array.from({ length: count }, (_, index) => {
     const angle = -Math.PI / 2 + (Math.PI * 2 * index) / count;
     return polarPoint(cx, cy, radius, angle);
+  });
+}
+
+function ellipsePoints(cx, cy, rx, ry, count, startAngle = -Math.PI / 2) {
+  return Array.from({ length: count }, (_, index) => {
+    const angle = startAngle + (Math.PI * 2 * index) / count;
+    return {
+      x: cx + Math.cos(angle) * rx,
+      y: cy + Math.sin(angle) * ry
+    };
   });
 }
 
@@ -81,6 +162,37 @@ function diamondPoints(cx, cy, width, height) {
     { x: cx, y: cy + height / 2 },
     { x: cx - width / 2, y: cy }
   ];
+}
+
+function heartPoints(cx = 120, cy = 112, scale = 4.7) {
+  return Array.from({ length: 72 }, (_, index) => {
+    const t = (Math.PI * 2 * index) / 72;
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+    return { x: cx + x * scale, y: cy + y * scale };
+  });
+}
+
+function cloverPoints() {
+  return Array.from({ length: 84 }, (_, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 84;
+    const radius = 46 + 18 * Math.cos(4 * angle);
+    return {
+      x: 120 + Math.cos(angle) * radius,
+      y: 112 + Math.sin(angle) * radius
+    };
+  });
+}
+
+function briochePoints() {
+  return Array.from({ length: 84 }, (_, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 84;
+    const radius = 48 + 16 * Math.cos(2 * angle);
+    return {
+      x: 120 + Math.cos(angle) * radius * 1.18,
+      y: 118 + Math.sin(angle) * radius * 0.9 + Math.sin(2 * angle) * 6
+    };
+  });
 }
 
 function birdPoints() {
@@ -136,6 +248,126 @@ function bearPoints() {
   ];
 }
 
+function dogPoints() {
+  return [
+    { x: 48, y: 124 },
+    { x: 62, y: 91 },
+    { x: 86, y: 82 },
+    { x: 99, y: 55 },
+    { x: 116, y: 82 },
+    { x: 144, y: 81 },
+    { x: 160, y: 55 },
+    { x: 177, y: 84 },
+    { x: 198, y: 104 },
+    { x: 184, y: 129 },
+    { x: 160, y: 139 },
+    { x: 151, y: 162 },
+    { x: 123, y: 169 },
+    { x: 99, y: 158 },
+    { x: 80, y: 168 },
+    { x: 62, y: 146 }
+  ];
+}
+
+function giraffePoints() {
+  return [
+    { x: 64, y: 146 },
+    { x: 74, y: 98 },
+    { x: 90, y: 82 },
+    { x: 94, y: 48 },
+    { x: 110, y: 68 },
+    { x: 125, y: 47 },
+    { x: 137, y: 78 },
+    { x: 165, y: 84 },
+    { x: 188, y: 104 },
+    { x: 176, y: 132 },
+    { x: 150, y: 139 },
+    { x: 141, y: 166 },
+    { x: 106, y: 166 },
+    { x: 93, y: 144 }
+  ];
+}
+
+function hourglassPoints() {
+  return [
+    { x: 70, y: 50 },
+    { x: 172, y: 50 },
+    { x: 146, y: 86 },
+    { x: 126, y: 112 },
+    { x: 149, y: 144 },
+    { x: 174, y: 174 },
+    { x: 68, y: 174 },
+    { x: 93, y: 144 },
+    { x: 116, y: 112 },
+    { x: 94, y: 86 }
+  ];
+}
+
+function headphonesPoints() {
+  return [
+    { x: 62, y: 154 },
+    { x: 52, y: 154 },
+    { x: 52, y: 112 },
+    { x: 64, y: 102 },
+    { x: 70, y: 84 },
+    { x: 92, y: 62 },
+    { x: 120, y: 55 },
+    { x: 148, y: 62 },
+    { x: 170, y: 84 },
+    { x: 176, y: 102 },
+    { x: 188, y: 112 },
+    { x: 188, y: 154 },
+    { x: 178, y: 154 },
+    { x: 166, y: 130 },
+    { x: 161, y: 105 },
+    { x: 144, y: 86 },
+    { x: 120, y: 80 },
+    { x: 96, y: 86 },
+    { x: 79, y: 105 },
+    { x: 74, y: 130 }
+  ];
+}
+
+function spadePoints() {
+  return [
+    { x: 120, y: 44 },
+    { x: 154, y: 74 },
+    { x: 181, y: 105 },
+    { x: 170, y: 140 },
+    { x: 139, y: 143 },
+    { x: 151, y: 169 },
+    { x: 90, y: 169 },
+    { x: 102, y: 143 },
+    { x: 70, y: 140 },
+    { x: 59, y: 105 },
+    { x: 86, y: 74 }
+  ];
+}
+
+function crownPoints() {
+  return [
+    { x: 55, y: 158 },
+    { x: 61, y: 86 },
+    { x: 91, y: 120 },
+    { x: 119, y: 56 },
+    { x: 148, y: 120 },
+    { x: 179, y: 86 },
+    { x: 185, y: 158 }
+  ];
+}
+
+function victoryVPoints() {
+  return [
+    { x: 51, y: 58 },
+    { x: 86, y: 58 },
+    { x: 120, y: 144 },
+    { x: 154, y: 58 },
+    { x: 189, y: 58 },
+    { x: 136, y: 174 },
+    { x: 104, y: 174 }
+  ];
+}
+
 function baseShapePoints(kind) {
   const map = {
     star: starPoints(120, 112, 74, 35, 5),
@@ -143,7 +375,19 @@ function baseShapePoints(kind) {
     diamond: diamondPoints(120, 116, 140, 140),
     bird: birdPoints(),
     rabbit: rabbitPoints(),
-    bear: bearPoints()
+    bear: bearPoints(),
+    heart: heartPoints(),
+    dog: dogPoints(),
+    giraffe: giraffePoints(),
+    brioche: briochePoints(),
+    longRectangle: rectPoints(36, 78, 168, 74),
+    ovalTart: ellipsePoints(120, 116, 82, 53, 72),
+    hourglass: hourglassPoints(),
+    clover: cloverPoints(),
+    headphones: headphonesPoints(),
+    spade: spadePoints(),
+    crown: crownPoints(),
+    victoryV: victoryVPoints()
   };
 
   return map[kind];
@@ -194,7 +438,7 @@ function pointsToPath(points) {
   return `${points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ")} Z`;
 }
 
-function doughPath(startPoints, targetPoints, progress, wobble, pull) {
+function doughPath(startPoints, targetPoints, progress, wobble, pull, center) {
   const eased = 1 - Math.pow(1 - progress, 2);
   const pullAngle = Math.atan2(pull.y, pull.x);
   const pullDistance = Math.hypot(pull.x, pull.y);
@@ -202,7 +446,7 @@ function doughPath(startPoints, targetPoints, progress, wobble, pull) {
   const points = startPoints.map((point, index) => {
     const target = targetPoints[index];
     const wiggle = Math.sin(wobble + index * 0.55) * (1 - progress) * 3;
-    const angle = Math.atan2(point.y - DOUGH_CENTER.y, point.x - DOUGH_CENTER.x);
+    const angle = Math.atan2(point.y - center.y, point.x - center.x);
     const directionalPull = Math.max(0, Math.cos(angle - pullAngle));
     const localPull = Math.pow(directionalPull, 1.7) * pullStrength;
     const oppositePull = Math.max(0, -Math.cos(angle - pullAngle)) * pullStrength * 0.18;
@@ -216,10 +460,13 @@ function doughPath(startPoints, targetPoints, progress, wobble, pull) {
   return pointsToPath(points);
 }
 
-function facePosition(progress) {
-  const y = lerp(121, 132, progress);
+function facePosition(progress, center) {
+  const y = lerp(center.y + 3, center.y + 14, progress);
   const scale = lerp(1, 0.88, progress);
-  const smile = progress >= DONE_AT ? "M 106 137 Q 120 148 134 137" : "M 108 138 Q 120 144 132 138";
+  const smileY = center.y + 20;
+  const smile = progress >= DONE_AT
+    ? `M ${center.x - 14} ${smileY - 1} Q ${center.x} ${smileY + 10} ${center.x + 14} ${smileY - 1}`
+    : `M ${center.x - 12} ${smileY} Q ${center.x} ${smileY + 6} ${center.x + 12} ${smileY}`;
 
   return { y, scale, smile };
 }
@@ -245,17 +492,16 @@ function makeFlourDots(card) {
 }
 
 function updateCard(state) {
-  const wobble = state.wobble;
-  const path = doughPath(state.startPoints, state.targetPoints, state.progress, wobble, state.pull);
-  const face = facePosition(state.progress);
+  const path = doughPath(state.startPoints, state.targetPoints, state.progress, state.wobble, state.pull, state.center);
+  const face = facePosition(state.progress, state.center);
 
   state.dough.setAttribute("d", path);
-  state.leftEye.setAttribute("cx", lerp(106, 102, state.progress));
+  state.leftEye.setAttribute("cx", lerp(state.center.x - 14, state.center.x - 18, state.progress));
   state.leftEye.setAttribute("cy", face.y);
-  state.rightEye.setAttribute("cx", lerp(134, 138, state.progress));
+  state.rightEye.setAttribute("cx", lerp(state.center.x + 14, state.center.x + 18, state.progress));
   state.rightEye.setAttribute("cy", face.y);
   state.mouth.setAttribute("d", face.smile);
-  state.face.setAttribute("transform", `scale(${face.scale} ${face.scale}) translate(${(120 / face.scale - 120).toFixed(2)} 0)`);
+  state.face.setAttribute("transform", `scale(${face.scale} ${face.scale}) translate(${(state.center.x / face.scale - state.center.x).toFixed(2)} 0)`);
   state.card.classList.toggle("is-almost", state.progress >= 0.62 && !state.done);
 }
 
@@ -313,6 +559,12 @@ function snapToTarget(state) {
   });
 }
 
+function showLevelComplete(level) {
+  levelCompleteKicker.textContent = `${level.name} réussi`;
+  levelCompleteTitle.textContent = level.completeText;
+  levelCompleteScreen.classList.remove("is-hidden");
+}
+
 function completeCard(state) {
   if (state.done) {
     return;
@@ -335,7 +587,14 @@ function completeCard(state) {
   }, 760);
 
   if ([...cards.values()].every((card) => card.done)) {
+    const level = LEVELS[currentLevelIndex];
     window.setTimeout(() => {
+      if (currentLevelIndex < LEVELS.length - 1) {
+        statusMessage.textContent = `${level.name} terminé !`;
+        showLevelComplete(level);
+        return;
+      }
+
       statusMessage.textContent = "Fifi applaudit : tous les pâtons magiques sont prêts !";
       victoryScreen.classList.remove("is-hidden");
     }, 620);
@@ -353,8 +612,8 @@ function pointerInSvg(event, state) {
 
 function updatePullFromPointer(event, state) {
   const point = pointerInSvg(event, state);
-  const dx = point.x - DOUGH_CENTER.x;
-  const dy = point.y - DOUGH_CENTER.y;
+  const dx = point.x - state.center.x;
+  const dy = point.y - state.center.y;
   const distance = Math.hypot(dx, dy);
   const maxPull = 34;
   const scale = distance > maxPull ? maxPull / distance : 1;
@@ -428,10 +687,25 @@ function onPointerEnd(event, state) {
   }
 }
 
+function applyPosition(card, shape) {
+  const position = shape.position;
+  const mobilePosition = shape.mobilePosition || position;
+
+  card.style.setProperty("--x", `${position.x}%`);
+  card.style.setProperty("--y", `${position.y}%`);
+  card.style.setProperty("--w", `${position.w}%`);
+  card.style.setProperty("--h", `${position.h}%`);
+  card.style.setProperty("--mx", `${mobilePosition.x}%`);
+  card.style.setProperty("--my", `${mobilePosition.y}%`);
+  card.style.setProperty("--mw", `${mobilePosition.w}%`);
+  card.style.setProperty("--mh", `${mobilePosition.h}%`);
+}
+
 function createCard(shape) {
   const card = document.createElement("article");
   card.className = "dough-card is-idle";
   card.setAttribute("aria-label", `${shape.label} à étirer`);
+  applyPosition(card, shape);
 
   const label = document.createElement("span");
   label.className = "shape-name";
@@ -443,9 +717,10 @@ function createCard(shape) {
   svg.setAttribute("role", "img");
   svg.setAttribute("aria-hidden", "true");
 
+  const start = shape.start || { x: 120, y: 118, r: 42 };
   const targetBase = baseShapePoints(shape.kind);
   const targetPoints = sampleClosedPolygon(targetBase, SAMPLE_COUNT);
-  const startPoints = circlePoints(120, 118, 42, SAMPLE_COUNT);
+  const startPoints = circlePoints(start.x, start.y, start.r, SAMPLE_COUNT);
 
   const target = document.createElementNS("http://www.w3.org/2000/svg", "path");
   target.classList.add("target-shape");
@@ -484,6 +759,7 @@ function createCard(shape) {
     leftEye,
     rightEye,
     mouth,
+    center: { x: start.x, y: start.y },
     targetPoints,
     startPoints,
     progress: 0,
@@ -508,21 +784,40 @@ function createCard(shape) {
   return card;
 }
 
-function renderLevel(level) {
+function renderLevel(levelIndex) {
+  currentLevelIndex = levelIndex;
+  const level = LEVELS[currentLevelIndex];
+
   cards.forEach((card) => stopAnimation(card));
   cards.clear();
   board.replaceChildren(...level.shapes.map(createCard));
   doneCount.textContent = "0";
+  doneTotal.textContent = String(level.shapes.length);
+  levelName.textContent = level.name;
   statusMessage.textContent = "Attrape un pâton rond, puis tire doucement pour guider la pâte.";
+  levelCompleteScreen.classList.add("is-hidden");
   victoryScreen.classList.add("is-hidden");
 }
 
-renderLevel(currentLevel);
+function showMenu() {
+  menuScreen.classList.remove("is-hidden");
+  levelCompleteScreen.classList.add("is-hidden");
+  victoryScreen.classList.add("is-hidden");
+  renderLevel(0);
+}
+
+renderLevel(0);
 
 startButton.addEventListener("click", () => {
   menuScreen.classList.add("is-hidden");
+  renderLevel(0);
+});
+
+nextLevelButton.addEventListener("click", () => {
+  const nextLevel = Math.min(currentLevelIndex + 1, LEVELS.length - 1);
+  renderLevel(nextLevel);
 });
 
 replayButton.addEventListener("click", () => {
-  renderLevel(currentLevel);
+  showMenu();
 });
