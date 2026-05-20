@@ -118,6 +118,26 @@ button {
   box-shadow: 2px 2px 0 var(--ink);
 }
 
+.site-return-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  margin-top: 14px;
+  padding: 8px 14px;
+  border: 4px solid var(--ink);
+  border-radius: 999px;
+  color: var(--ink);
+  background: #fff;
+  box-shadow: 4px 5px 0 var(--ink);
+  text-decoration: none;
+}
+
+.site-return-button:active {
+  transform: translate(2px, 3px);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
 .game-shell {
   width: min(1320px, calc(100% - 24px));
   margin: 0 auto;
@@ -309,8 +329,8 @@ h1 {
   position: absolute;
   left: 3.4%;
   right: 3.4%;
-  top: 44%;
-  bottom: 12%;
+  top: 41.5%;
+  bottom: 15.5%;
   min-height: 0;
   padding: 8px 30px 20px;
   border: 0;
@@ -595,8 +615,8 @@ h1 {
   .table {
     left: 4%;
     right: 4%;
-    top: 40%;
-    bottom: 9%;
+    top: 38%;
+    bottom: 13%;
     padding: 6px 8px 14px;
   }
 
