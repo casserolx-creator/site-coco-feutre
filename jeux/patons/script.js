@@ -98,9 +98,38 @@ const victoryScreen = document.querySelector("#victory-screen");
 const startButton = document.querySelector("#start-button");
 const nextLevelButton = document.querySelector("#next-level-button");
 const replayButton = document.querySelector("#replay-button");
+const soundToggle = document.querySelector("#sound-toggle");
 const levelName = document.querySelector("#level-name");
 const cards = new Map();
 let currentLevelIndex = 0;
+
+const SOUND_KEY = "cocoPatonsSound";
+const SOUND_FILES = {
+  menu: "sons/musique-menu.mp3",
+  game: "sons/musique-jeu.mp3",
+  levelComplete: "sons/musique-fin-niveau.mp3",
+  final: "sons/musique-fin.mp3",
+  stretch: "sons/etirement-paton.mp3",
+  success: "sons/paton-reussi.mp3"
+};
+const SOUND_VOLUMES = {
+  menu: 0.22,
+  game: 0.18,
+  levelComplete: 0.26,
+  final: 0.26,
+  stretch: 0.16,
+  success: 0.24
+};
+const LOOPING_SOUNDS = new Set(["menu", "game", "final"]);
+
+const audioState = {
+  enabled: readSoundChoice(),
+  unlocked: false,
+  desiredMusic: "menu",
+  currentMusic: null,
+  lastStretchAt: 0,
+  audios: {}
+};
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
@@ -116,6 +145,161 @@ function distanceBetween(a, b) {
 
 function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
+}
+
+function readSoundChoice() {
+  try {
+    return localStorage.getItem(SOUND_KEY) !== "off";
+  } catch (error) {
+    return true;
+  }
+}
+
+function saveSoundChoice(enabled) {
+  try {
+    localStorage.setItem(SOUND_KEY, enabled ? "on" : "off");
+  } catch (error) {
+    // The game still works when localStorage is blocked.
+  }
+}
+
+function getAudio(name) {
+  if (!SOUND_FILES[name] || typeof Audio === "undefined") {
+    return null;
+  }
+
+  if (!audioState.audios[name]) {
+    const audio = new Audio(SOUND_FILES[name]);
+    audio.preload = "auto";
+    audio.loop = LOOPING_SOUNDS.has(name);
+    audio.volume = SOUND_VOLUMES[name] ?? 0.2;
+    audio.addEventListener("error", () => {});
+    audioState.audios[name] = audio;
+  }
+
+  return audioState.audios[name];
+}
+
+function playAudio(audio, reset = false) {
+  if (!audio) {
+    return;
+  }
+
+  if (reset) {
+    try {
+      audio.currentTime = 0;
+    } catch (error) {
+      // Some mobile browsers can refuse currentTime changes before loading.
+    }
+  }
+
+  const playAttempt = audio.play();
+  if (playAttempt && typeof playAttempt.catch === "function") {
+    playAttempt.catch(() => {});
+  }
+}
+
+function stopAudio(name, reset = true) {
+  const audio = audioState.audios[name];
+  if (!audio) {
+    return;
+  }
+
+  audio.pause();
+  if (reset) {
+    try {
+      audio.currentTime = 0;
+    } catch (error) {
+      // Ignore missing or unloaded files.
+    }
+  }
+}
+
+function stopCurrentMusic() {
+  if (audioState.currentMusic) {
+    stopAudio(audioState.currentMusic);
+    audioState.currentMusic = null;
+  }
+}
+
+function setMusicTrack(name) {
+  audioState.desiredMusic = name;
+
+  if (!audioState.enabled || !audioState.unlocked) {
+    return;
+  }
+
+  if (audioState.currentMusic && audioState.currentMusic !== name) {
+    stopAudio(audioState.currentMusic);
+    audioState.currentMusic = null;
+  }
+
+  if (!name) {
+    return;
+  }
+
+  const audio = getAudio(name);
+  audioState.currentMusic = name;
+  playAudio(audio, true);
+}
+
+function playEffect(name) {
+  if (!audioState.enabled || !audioState.unlocked) {
+    return;
+  }
+
+  playAudio(getAudio(name), true);
+}
+
+function playStretchSound() {
+  const now = performance.now();
+  if (now - audioState.lastStretchAt < 700) {
+    return;
+  }
+
+  audioState.lastStretchAt = now;
+  playEffect("stretch");
+}
+
+function updateSoundButton() {
+  if (!soundToggle) {
+    return;
+  }
+
+  soundToggle.textContent = audioState.enabled ? "Son ON" : "Son OFF";
+  soundToggle.setAttribute("aria-pressed", String(audioState.enabled));
+  soundToggle.classList.toggle("is-off", !audioState.enabled);
+}
+
+function setSoundEnabled(enabled) {
+  audioState.enabled = enabled;
+  saveSoundChoice(enabled);
+  updateSoundButton();
+
+  if (!enabled) {
+    stopCurrentMusic();
+    Object.keys(audioState.audios).forEach((name) => {
+      if (name !== audioState.currentMusic) {
+        stopAudio(name);
+      }
+    });
+    return;
+  }
+
+  if (audioState.unlocked) {
+    setMusicTrack(audioState.desiredMusic);
+  }
+}
+
+function unlockAudio() {
+  if (audioState.unlocked) {
+    return;
+  }
+
+  audioState.unlocked = true;
+  if (audioState.enabled) {
+    setMusicTrack(audioState.desiredMusic);
+  }
 }
 
 function polarPoint(cx, cy, radius, angle) {
@@ -608,6 +792,8 @@ function showLevelComplete(level) {
   levelCompleteKicker.textContent = `${level.name} réussi`;
   levelCompleteTitle.textContent = level.completeText;
   levelCompleteScreen.classList.remove("is-hidden");
+  setMusicTrack(null);
+  playEffect("levelComplete");
 }
 
 function completeCard(state) {
@@ -627,6 +813,7 @@ function completeCard(state) {
   updateCard(state);
   doneCount.textContent = String([...cards.values()].filter((card) => card.done).length);
   statusMessage.textContent = `Bravo, ${state.successLabel} fait pouf dans la farine !`;
+  playEffect("success");
 
   window.setTimeout(() => {
     state.card.classList.remove("is-complete");
@@ -643,6 +830,7 @@ function completeCard(state) {
 
       statusMessage.textContent = "Fifi applaudit : tous les pâtons magiques sont prêts !";
       victoryScreen.classList.remove("is-hidden");
+      setMusicTrack("final");
     }, 620);
   }
 }
@@ -676,6 +864,8 @@ function onPointerDown(event, state) {
   }
 
   event.preventDefault();
+  unlockAudio();
+  playStretchSound();
   stopAnimation(state);
   state.dragging = true;
   state.pointerId = event.pointerId;
@@ -894,9 +1084,11 @@ function showMenu() {
   levelCompleteScreen.classList.add("is-hidden");
   victoryScreen.classList.add("is-hidden");
   renderLevel(0);
+  setMusicTrack("menu");
 }
 
 renderLevel(0);
+updateSoundButton();
 
 board.addEventListener("pointerdown", (event) => {
   if (event.target.closest(".dough-card")) {
@@ -910,15 +1102,27 @@ board.addEventListener("pointerdown", (event) => {
 });
 
 startButton.addEventListener("click", () => {
+  setMusicTrack("game");
+  unlockAudio();
   menuScreen.classList.add("is-hidden");
   renderLevel(0);
 });
 
 nextLevelButton.addEventListener("click", () => {
+  setMusicTrack("game");
+  unlockAudio();
   const nextLevel = Math.min(currentLevelIndex + 1, LEVELS.length - 1);
   renderLevel(nextLevel);
 });
 
 replayButton.addEventListener("click", () => {
+  unlockAudio();
   showMenu();
 });
+
+if (soundToggle) {
+  soundToggle.addEventListener("click", () => {
+    audioState.unlocked = true;
+    setSoundEnabled(!audioState.enabled);
+  });
+}
