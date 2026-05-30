@@ -229,6 +229,14 @@ function setMusicTrack(name) {
     return;
   }
 
+  if (audioState.currentMusic === name) {
+    const currentAudio = getAudio(name);
+    if (currentAudio && currentAudio.paused) {
+      playAudio(currentAudio, false);
+    }
+    return;
+  }
+
   if (audioState.currentMusic && audioState.currentMusic !== name) {
     stopAudio(audioState.currentMusic);
     audioState.currentMusic = null;
@@ -300,6 +308,14 @@ function unlockAudio() {
   if (audioState.enabled) {
     setMusicTrack(audioState.desiredMusic);
   }
+}
+
+function handleFirstAudioInteraction(event) {
+  if (event.target && typeof event.target.closest === "function" && event.target.closest("#sound-toggle")) {
+    return;
+  }
+
+  unlockAudio();
 }
 
 function polarPoint(cx, cy, radius, angle) {
@@ -1089,6 +1105,8 @@ function showMenu() {
 
 renderLevel(0);
 updateSoundButton();
+document.addEventListener("pointerdown", handleFirstAudioInteraction, { capture: true });
+document.addEventListener("keydown", handleFirstAudioInteraction, { capture: true });
 
 board.addEventListener("pointerdown", (event) => {
   if (event.target.closest(".dough-card")) {
@@ -1102,15 +1120,17 @@ board.addEventListener("pointerdown", (event) => {
 });
 
 startButton.addEventListener("click", () => {
-  setMusicTrack("game");
   unlockAudio();
+  stopAudio("levelComplete");
+  setMusicTrack("game");
   menuScreen.classList.add("is-hidden");
   renderLevel(0);
 });
 
 nextLevelButton.addEventListener("click", () => {
-  setMusicTrack("game");
   unlockAudio();
+  stopAudio("levelComplete");
+  setMusicTrack("game");
   const nextLevel = Math.min(currentLevelIndex + 1, LEVELS.length - 1);
   renderLevel(nextLevel);
 });
@@ -1122,7 +1142,7 @@ replayButton.addEventListener("click", () => {
 
 if (soundToggle) {
   soundToggle.addEventListener("click", () => {
-    audioState.unlocked = true;
+    unlockAudio();
     setSoundEnabled(!audioState.enabled);
   });
 }

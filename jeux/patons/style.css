@@ -111,6 +111,36 @@ button {
     url("fin-paton.png");
 }
 
+.screen-menu {
+  place-items: start end;
+  padding: clamp(70px, 9vh, 112px) clamp(24px, 5vw, 76px) 24px;
+}
+
+.screen-menu .screen-panel {
+  width: min(500px, 42vw);
+  background: rgba(255, 250, 214, 0.74);
+}
+
+.screen-menu .screen-panel h1 {
+  font-size: clamp(32px, 4.2vw, 58px);
+}
+
+.screen-victory {
+  place-items: end center;
+  padding: 18px 18px clamp(18px, 4vh, 44px);
+}
+
+.screen-victory .screen-panel {
+  width: min(740px, calc(100% - 24px));
+  padding: 18px 22px;
+  background: rgba(255, 250, 214, 0.74);
+}
+
+.screen-victory .screen-panel h2 {
+  margin-bottom: 14px;
+  font-size: clamp(30px, 4vw, 52px);
+}
+
 .screen-panel {
   position: relative;
   z-index: 1;
@@ -615,6 +645,29 @@ h1 {
 }
 
 @media (max-width: 860px) {
+  .screen-menu {
+    place-items: start center;
+    padding: 70px 14px 14px;
+  }
+
+  .screen-menu .screen-panel {
+    width: min(520px, 100%);
+  }
+
+  .screen-victory {
+    padding: 70px 10px 10px;
+  }
+
+  .screen-victory .screen-panel {
+    width: 100%;
+    max-height: calc(100vh - 84px);
+    overflow: auto;
+  }
+
+  .screen-victory .screen-panel h2 {
+    font-size: clamp(28px, 8vw, 42px);
+  }
+
   .game-shell {
     width: min(100% - 16px, 680px);
     padding-top: 10px;
@@ -714,6 +767,21 @@ h1 {
 
   .screen-panel {
     padding: 18px;
+  }
+
+  .screen-menu {
+    padding-top: 60px;
+  }
+
+  .screen-menu .screen-panel,
+  .screen-victory .screen-panel {
+    border-width: 4px;
+    box-shadow: 5px 6px 0 var(--ink);
+  }
+
+  .screen-panel h1,
+  .screen-panel h2 {
+    font-size: clamp(29px, 11vw, 42px);
   }
 
   .sound-toggle {
