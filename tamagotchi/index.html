@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#fff8eb"><meta name="description" content="Gros Matou dans sa petite console-œuf Coco Feutre. Sept boutons, Pinouille et la Ferme Foin-Foin.">
+<title>Gros Matou · Mon petit Coco</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="screen-mask.css">
+</head><body>
+<header><a class="brand" href="../#jeux" aria-label="Retour aux Jeux Coco Feutre"><span class="brand-mark">✿</span> COCO FEUTRE<span class="brand-dot">.</span></a><a class="back-link" href="../#jeux">← Les jeux</a></header>
+<main><div class="intro"><span class="eyebrow">MON PETIT COCO · GROS MATOU</span><h1>Un petit monde <span>à croquer.</span></h1><p>La Ferme Foin-Foin, un copain laineux… et sept boutons magiques.</p></div>
+<div class="toy-wrap"><span class="doodle star-left" aria-hidden="true">✧</span><span class="doodle star-right" aria-hidden="true">✦</span>
+<div class="console" aria-label="Console-œuf de Gros Matou">
+<div class="shell-art art" data-art="shell" aria-hidden="true"></div>
+<div class="toy-title" aria-hidden="true">GROS MATOU</div>
+<button id="sound" class="sound-switch" type="button" aria-pressed="false" aria-label="Activer le son" title="Activer ou couper les sons et les miaous"><span class="sound-icon" aria-hidden="true">♪</span><span class="sound-track" aria-hidden="true"><i></i></span><span class="sound-label">SON OFF</span></button>
+<div class="screen" data-state="idle" role="img" aria-label="Gros Matou dans la cour de la Ferme Foin-Foin">
+<div class="farm art" data-art="farm"></div><div class="night"></div><span class="moon" aria-hidden="true">☾</span>
+<div class="pillow prop art" data-art="pillow"></div>
+<div class="cat actor art" id="cat" data-art="front"></div>
+<div class="friend actor art" data-art="pinouille"></div>
+<div class="ball prop art" data-art="ball"></div><div class="water prop art" data-art="water"></div><div class="food prop art" data-art="food"></div>
+<div class="toilet prop art" data-art="toilet"></div>
+<div class="grass art" data-art="grass"></div><div class="sparkles" id="effect-text" aria-hidden="true">♡</div>
+</div>
+<button class="control shoulder l" data-action="wave" aria-label="L : faire coucou et miaou" title="Coucou… et miaou !"><b>L</b><span>Coucou</span></button>
+<button class="control shoulder r" data-action="drink" aria-label="R : boire un bol d’eau"><b>R</b><span>Boire</span></button>
+<button class="control face x" data-action="play" aria-label="X : jouer avec Pinouille"><b>X</b><span>Les amis</span></button>
+<button class="control face y" data-action="sleep" aria-label="Y : faire dodo"><b>Y</b><span>Dodo</span></button>
+<button class="control face a" data-action="jump" aria-label="A : sauter"><b>A</b><span>Sauter</span></button>
+<button class="control face b" data-action="eat" aria-label="B : manger les croquettes"><b>B</b><span>Manger</span></button>
+<button class="bidou" data-action="toilet" aria-label="Petit Coin Bidou"><span>Petit Coin</span><strong>Bidou</strong></button>
+</div></div>
+<div class="message" aria-live="polite" aria-atomic="true"><span id="mood">✿ Tout tranquille</span><p id="speech">Un petit coucou à Gros Matou ?</p></div>
+<div class="souvenirs" aria-label="Petits bonheurs découverts"><p id="progress-count">0 / 7 petits bonheurs découverts</p><div id="progress-icons"></div></div>
+<p class="hint">Cliquez sur les boutons <span>ou utilisez A, B, X, Y, L, R et Espace.</span></p>
+<div class="under-toy"><span class="status-dot"></span> Toujours heureux de vous retrouver.</div>
+<footer>Un petit compagnon Coco Feutre · Version de base<br><span id="save-note">Vos petits bonheurs sont gardés sur cet appareil.</span></footer>
+</main><script src="atlas.js"></script><script src="sounds.js"></script><script src="progress.js"></script><script src="game.js"></script></body></html>
